@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -7,7 +5,6 @@ const Listing = require("./models/listing.js");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-
 const wrapAsync = require("./utils/wrapAsync");
 const ExpressError = require("./utils/ExpressError");
 const listingSchema = require("./schema.js");
@@ -41,10 +38,12 @@ const validateListing = (req, res, next) => {
     const { error } = listingSchema.validate(req.body);
 
     if (error) {
-        const errMsg = error.details.map(el => el.message).join(",");
+        const errMsg = error.details.map((el) => el.message).join(",");
         throw new ExpressError(400, errMsg);
+    }else{
+        next();
+
     }
-    next();
 };
 
 // =======================
@@ -82,7 +81,7 @@ app.get("/listings/:id", wrapAsync(async (req, res) => {
 // CREATE
 app.post("/listings",
     validateListing,
-    wrapAsync(async (req, res) => {
+    wrapAsync(async (req, res,next) => {
         const newListing = new Listing(req.body.listing);
         await newListing.save();
         res.redirect("/listings");
